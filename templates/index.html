@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Emotion Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Add Chart.js for timeline visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Real-time Emotion Detection</h1>
+        
+        <div class="box-container">
+            <!-- Input Section -->
+            <div class="box">
+                <div class="tabs">
+                    <button id="webcam-tab" class="tab-btn active">Webcam</button>
+                    <button id="upload-tab" class="tab-btn">Upload</button>
+                </div>
+                
+                <!-- Webcam Content -->
+                <div id="webcam-content" class="tab-content active">
+                    <div class="video-container">
+                        <video id="video" autoplay></video>
+                        <canvas id="canvas"></canvas>
+                    </div>
+                    <div class="controls">
+                        <button id="start-btn">Start Camera</button>
+                        <button id="stop-btn" disabled>Stop Camera</button>
+                    </div>
+                </div>
+                
+                <!-- Upload Content -->
+                <div id="upload-content" class="tab-content">
+                    <div class="upload-options">
+                        <button id="image-option-btn" class="option-btn active">Image</button>
+                        <button id="video-option-btn" class="option-btn">Video</button>
+                    </div>
+                    
+                    <!-- Image Upload -->
+                    <div id="image-upload-container">
+                        <div id="image-drop-area">
+                            <p>Drag & drop image here or click to select</p>
+                            <input type="file" id="image-upload" accept="image/*">
+                        </div>
+                        <div id="preview-container">
+                            <img id="preview-image" alt="Preview">
+                            <canvas id="preview-canvas"></canvas>
+                        </div>
+                        <button id="analyze-btn" disabled>Analyze Emotion</button>
+                    </div>
+                    
+                    <!-- Video Upload -->
+                    <div id="video-upload-container" style="display: none;">
+                        <div id="drop-area">
+                            <p>Drag & drop video here or click to select</p>
+                            <input type="file" id="video-upload" accept="video/*">
+                        </div>
+                        <div id="video-preview-container">
+                            <video id="uploaded-video" controls></video>
+                            <canvas id="video-canvas"></canvas>
+                        </div>
+                        <div class="video-controls">
+                            <button id="play-analyze-btn" disabled>Play & Analyze</button>
+                            <button id="stop-analyze-btn" disabled>Stop Analysis</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="box">
+                <h2>Detected Emotions</h2>
+                <div id="emotions-list" class="emotions-list"></div>
+            </div>
+            
+            <!-- Emotion Timeline Chart -->
+            <div class="box">
+                <h2>Emotion Timeline</h2>
+                <div class="chart-container">
+                    <canvas id="emotion-timeline"></canvas>
+                </div>
+                <div class="chart-info">
+                    <p>This chart shows your emotion patterns over time</p>
+                </div>
+            </div>
+            
+            <!-- Emotion Distribution Chart -->
+            <div class="box">
+                <h2>Emotion Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="emotion-distribution"></canvas>
+                </div>
+                <div class="chart-info">
+                    <p>Percentage breakdown of your detected emotions</p>
+                </div>
+            </div>
+            
+            <!-- AI Emotion Profiling -->
+            <div class="box">
+                <h2>AI Emotion Profile</h2>
+                <div id="profile-content" class="profile-box">
+                    <p>Your emotional profile will appear here after analysis.</p>
+                    <p class="profile-date">Last updated: Wednesday, April 09, 2025, 8:35 AM IST</p>
+                </div>
+                <button id="analyze-profile-btn">Generate Emotional Profile</button>
+            </div>
+            
+            <!-- Emotion Legend -->
+            <div class="box">
+                <h2>Emotions Legend</h2>
+                <div class="emotion-grid">
+                    <div class="emotion-item angry">
+                        <div class="emotion-color"></div>
+                        <span>Angry</span>
+                    </div>
+                    <div class="emotion-item disgust">
+                        <div class="emotion-color"></div>
+                        <span>Disgust</span>
+                    </div>
+                    <div class="emotion-item fear">
+                        <div class="emotion-color"></div>
+                        <span>Fear</span>
+                    </div>
+                    <div class="emotion-item happy">
+                        <div class="emotion-color"></div>
+                        <span>Happy</span>
+                    </div>
+                    <div class="emotion-item sad">
+                        <div class="emotion-color"></div>
+                        <span>Sad</span>
+                    </div>
+                    <div class="emotion-item surprise">
+                        <div class="emotion-color"></div>
+                        <span>Surprise</span>
+                    </div>
+                    <div class="emotion-item neutral">
+                        <div class="emotion-color"></div>
+                        <span>Neutral</span>
+                    </div>
+                    <div class="emotion-item anxiety">
+                        <div class="emotion-color"></div>
+                        <span>Anxiety</span>
+                    </div>
+                    <div class="emotion-item embarrassed">
+                        <div class="emotion-color"></div>
+                        <span>Embarrassed</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics Summary -->
+            <div class="box">
+                <h2>Emotion Statistics</h2>
+                <div id="statistics-summary" class="statistics-box">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Detections:</span>
+                        <span id="total-detections" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Dominant Emotion:</span>
+                        <span id="dominant-emotion" class="stat-value">None</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Emotional Diversity:</span>
+                        <span id="emotion-diversity" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Session Duration:</span>
+                        <span id="session-duration" class="stat-value">00:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
